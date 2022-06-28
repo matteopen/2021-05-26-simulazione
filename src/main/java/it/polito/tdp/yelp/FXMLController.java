@@ -5,8 +5,10 @@
 package it.polito.tdp.yelp;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,16 +37,16 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCitta"
-    private ComboBox<?> cmbCitta; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCitta; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX"
     private TextField txtX; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
-    private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
+    private ComboBox<Business> cmbLocale; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -52,15 +54,53 @@ public class FXMLController {
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
     	
+    	txtResult.clear();
+    	String result = "Miglior cammino: \n";
+    	Business partenza = this.cmbLocale.getValue();
+    	if(partenza==null) {
+    		this.txtResult.setText("Selezionare business");
+    	}
+    	Double soglia = Double.parseDouble(this.txtX.getText());
+    	if(soglia==null || soglia<0.0 || soglia>1.0) {
+    		this.txtResult.setText("Inserire soglia corretta");
+    	}
+    	List<Business> best = this.model.cerca(partenza, soglia);
+    	for(Business b : best) {
+    		result+=b+"\n";
+    	}
+    	txtResult.appendText(result);
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	
+    	this.txtResult.clear();
+    	String city = this.cmbCitta.getValue();
+    	if(city == null) {
+    		this.txtResult.setText("Selezionare città!");
+    		return;
+    	}
+    	Integer year = this.cmbAnno.getValue();
+    	if(year == null) {
+    		this.txtResult.setText("Selezionare anno!");
+    		return;
+    	}
+    	this.model.creaGrafo(city, year);
+    	this.txtResult.appendText("Grafo creato!\n");
+    	this.txtResult.appendText("#Vertici: "+this.model.nVertices()+"\n");
+    	this.txtResult.appendText("#Archi: "+this.model.nEdges()+"\n");
+    	
+    	this.cmbLocale.getItems().addAll(this.model.businesses());
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	
+    	Business result = this.model.best();
+    	
+    	this.txtResult.appendText("Miglior locale: "+result);
 
     }
 
@@ -78,5 +118,8 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.cmbAnno.getItems().addAll(this.model.getYears());
+    	this.cmbCitta.getItems().addAll(this.model.getCities());
     }
 }

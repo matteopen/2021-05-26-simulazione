@@ -13,6 +13,7 @@ public class Business {
 	private double longitude;
 	private String state;
 	private double stars;
+	private double media;
 	
 	
 	public Business(String businessId, String fullAddress, String active, String categories, String city, int reviewCount,
@@ -30,8 +31,24 @@ public class Business {
 		this.longitude = longitude;
 		this.state = state;
 		this.stars = stars;
+		this.media = 0.0;
+		
 	}
 	
+	
+	
+	public double getMedia() {
+		return media;
+	}
+
+
+
+	public void setMedia(double media) {
+		this.media = media;
+	}
+
+
+
 	public String getBusinessId() {
 		return businessId;
 	}
@@ -130,5 +147,13 @@ public class Business {
 		return true;
 	}
 
+
+
+	@Override
+	public String toString() {
+		return  businessName ;
+	}
+
+	
 	
 }
